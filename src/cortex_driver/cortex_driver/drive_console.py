@@ -13,7 +13,7 @@ def make_motor_call(m1, m2):
     except rospy.ServiceException as e:
         print("Service call failed: {}".format(str(e)))
 
-if __name__ == '__main__':
+def main():
     while True:
         i = input("m> ")
         if i == 'e' or i == 'exit':
@@ -35,3 +35,6 @@ if __name__ == '__main__':
             m2 = int(m.group(2))
 
             make_motor_call(m1, m2)
+
+if __name__ == '__main__':
+    main()

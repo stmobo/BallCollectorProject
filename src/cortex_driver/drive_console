@@ -1,0 +1,5 @@
+#!/usr/bin/env python3
+import cortex_driver.drive_console
+
+if __name__ == '__main__':
+    cortex_driver.drive_console.main()

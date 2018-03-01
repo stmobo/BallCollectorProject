@@ -169,7 +169,7 @@ include_directories(
 #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
 
-catkin_install_python(PROGRAMS cortex_driver/drive_console.py cortex_driver/robot_driver.py
+catkin_install_python(PROGRAMS drive_console robot_driver
 DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 ## Mark executables and/or libraries for installation
