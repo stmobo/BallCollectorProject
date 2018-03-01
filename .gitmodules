@@ -1,0 +1,6 @@
+[submodule "src/hector_slam"]
+	path = src/hector_slam
+	url = https://github.com/tu-darmstadt-ros-pkg/hector_slam.git
+[submodule "src/rplidar_ros"]
+	path = src/rplidar_ros
+	url = https://github.com/robopeak/rplidar_ros.git
