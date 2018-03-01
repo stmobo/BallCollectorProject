@@ -64,6 +64,8 @@ task main()
 
 			motor[motor1] = m1;
 			motor[motor2] = m2;
+
+			sendChar(UART1, 0x55);
 		} else if(sub_cmd == 0x02) {
 			/* Get encoder data */
 			writeDebugStreamLine("Got read encoder data command");
