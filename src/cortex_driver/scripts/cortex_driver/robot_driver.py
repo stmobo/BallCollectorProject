@@ -76,7 +76,12 @@ def main():
             if cur_m2 < 0:
                 cur_m2 = 256 + cur_m2
 
+            rospy.loginfo("Sending motor power request: {} / {} ({:x} / {:x})".format(
+                m1, m2, cur_m1, cur_m2
+            ))
+
             ser.write([0xAA, 0x01, cur_m1, cur_m2])
+            ser.flush()
 
             ser.write([0xAA, 0x02])
             ser.flush()
