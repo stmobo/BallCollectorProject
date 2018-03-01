@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import cortex_driver_node.drive_console
+import cortex_driver.drive_console
 
 if __name__ == '__main__':
-    cortex_driver_node.drive_console.main()
+    cortex_driver.drive_console.main()
