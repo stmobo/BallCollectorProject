@@ -15,7 +15,7 @@ def make_motor_call(m1, m2):
 
 def main():
     while True:
-        i = input("m> ")
+        i = raw_input("m> ")
         if i == 'e' or i == 'exit':
             break
         elif i == '':
