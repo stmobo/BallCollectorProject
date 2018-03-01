@@ -13,7 +13,11 @@ from cortex_driver.srv import *
 
 import serial
 
+m1 = 0
+m2 = 0
+
 def main():
+    global m1, m2
     rospy.init_node('robot_driver')
 
     odom_pub = rospy.Publisher("odom", Odometry, queue_size=50)
@@ -53,10 +57,9 @@ def main():
                 return False
 
     with serial.Serial('/dev/serial0', 9600, timeout=0.050) as ser:
-        m1 = 0
-        m2 = 0
-
         def handle_motor_power_request(req):
+            global m1, m2
+
             m1 = req.left_power
             m2 = req.right_power
             return MotorPowerResponse()
