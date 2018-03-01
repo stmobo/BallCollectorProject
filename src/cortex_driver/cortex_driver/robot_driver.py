@@ -8,6 +8,7 @@ import rospy
 import tf
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3
+from std_msgs.msg import Int16, Float64
 
 import serial
 
@@ -16,6 +17,15 @@ def main():
 
     odom_pub = rospy.Publisher("odom", Odometry, queue_size=50)
     odom_broadcaster = tf.TransformBroadcaster()
+
+    enc_left_pub = rospy.Publisher("enc_left", Int16, queue_size=10)
+    enc_right_pub = rospy.Publisher("enc_right", Int16, queue_size=10)
+
+    dist_left_pub = rospy.Publisher("dist_left", Float64, queue_size=10)
+    dist_right_pub = rospy.Publisher("dist_right", Float64, queue_size=10)
+
+    vel_left_pub = rospy.Publisher("vel_left", Float64, queue_size=10)
+    vel_right_pub = rospy.Publisher("vel_right", Float64, queue_size=10)
 
     cur_pose = np.zeros(3)  # x, y, hdg
     cur_vel = np.zeros(3)  # same order as above
@@ -148,6 +158,15 @@ def main():
                 )
 
                 odom_pub.publish(odom)
+
+                # publish debug data
+                enc_left_pub.publish(enc_left)
+                dist_left_pub.publish(enc_left * (wheel_circum / encoder_conv_factor))
+                vel_left_pub.publish(lv_left)
+
+                enc_right_pub.publish(enc_right)
+                dist_right_pub.publish(enc_right * (wheel_circum / encoder_conv_factor))
+                vel_right_pub.publish(lv_right)
 
                 last_t = t
                 r.sleep()
