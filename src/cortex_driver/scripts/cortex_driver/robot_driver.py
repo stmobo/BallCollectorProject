@@ -47,17 +47,17 @@ def main():
     encoder_conv_factor = 627.2  # ticks per revolution
 
     def wait_for_start_byte(ser):
-        try:
-            start_t = rospy.Time.now()
-            while True:
+        start_t = rospy.Time.now()
+        while True:
+            try:
                 start_byte = ser.read(1)
                 if start_byte == b'\x55':
                     return True
 
                 if (rospy.Time.now() - start_t).to_sec() >= 0.050:
                     return False
-        except serial.serialutil.SerialException as e:
-            print("Caught serial exception: {}".format(str(e)))
+            except serial.serialutil.SerialException as e:
+                print("Caught serial exception: {}".format(str(e)))
 
     with serial.Serial('/dev/serial0', 9600, timeout=0.050) as ser:
         def handle_motor_power_request(req):
@@ -78,12 +78,15 @@ def main():
 
             n = 0
             while n < 5:
-                ser.write([0xAA, 0x01, m1, m2])
-                ser.flush()
-                if wait_for_start_byte(ser):
-                    # acknowledgement received
-                    break
-                n += 1
+                try:
+                    ser.write([0xAA, 0x01, m1, m2])
+                    ser.flush()
+                    if wait_for_start_byte(ser):
+                        # acknowledgement received
+                        break
+                    n += 1
+                except serial.serialutil.SerialException as e:
+                    print("Caught serial exception: {}".format(str(e)))
 
             return MotorPowerResponse()
 
