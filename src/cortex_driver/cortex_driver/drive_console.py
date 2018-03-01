@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import rospy
 import re
-from srv import *
+from .srv import *
 
 ptn = re.compile(r'\s*(\-?\d+)\s*[/|,]\s*(\-?\d+)')
 
