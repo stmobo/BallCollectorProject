@@ -53,6 +53,9 @@ def main():
                 return False
 
     with serial.Serial('/dev/serial0', 9600, timeout=0.050) as ser:
+        m1 = 0
+        m2 = 0
+        
         def handle_motor_power_request(req):
             m1 = req.left_power
             m2 = req.right_power
