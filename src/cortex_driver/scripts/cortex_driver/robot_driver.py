@@ -124,8 +124,8 @@ def main():
                         continue
 
                     # rotational velocity in ticks
-                    rv_left = (enc_left - last_enc_left) / dt
-                    rv_right = (enc_right - last_enc_right) / dt
+                    rv_left = -(enc_left - last_enc_left) / dt
+                    rv_right = -(enc_right - last_enc_right) / dt
 
                     last_enc_left = enc_left
                     last_enc_right = enc_right
