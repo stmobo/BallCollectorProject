@@ -8,6 +8,7 @@ import rospy
 import tf
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3
+from cortex_driver.srv import MotorPower, MotorPowerResponse
 
 import serial
 
@@ -40,9 +41,27 @@ def wait_for_start_byte(ser):
 			return False
 
 with serial.Serial('/dev/serial0', 9600, timeout=0.050) as ser:
+	m1 = 0
+	m2 = 0
+
+	def handle_motor_power_request(req):
+		m1 = req.left_power
+		m2 = req.right_power
+		return MotorPowerResponse()
+
+	mp_serv = rospy.Service('motor_power', MotorPower, handle_motor_power_request)
+
     while not rospy.is_shutdown():
         t = rospy.Time.now()
         dt = (t - last_t).to_sec()
+
+		if m1 < 0:
+			m1 = 256 + m1
+
+		if m2 < 0:
+			m2 = 256 + m2
+
+		ser.write([0xAA, 0x01, m1, m2])
 
         ser.write([0xAA, 0x02])
 		ser.flush()
