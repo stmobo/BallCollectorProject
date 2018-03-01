@@ -62,6 +62,26 @@ def main():
 
             m1 = req.left_power
             m2 = req.right_power
+
+            if m1 < 0:
+                m1 = 256 + m1
+
+            if m2 < 0:
+                m2 = 256 + m2
+
+            rospy.loginfo("Sending motor power request: {} / {} ({:x} / {:x})".format(
+                req.left_power, req.right_power, m1, m2
+            ))
+
+            n = 0
+            while n < 5:
+                ser.write([0xAA, 0x01, m1, m2])
+                ser.flush()
+                if wait_for_start_byte(ser):
+                    # acknowledgement received
+                    break
+                n += 1
+
             return MotorPowerResponse()
 
         mp_serv = rospy.Service('motor_power', MotorPower, handle_motor_power_request)
@@ -69,22 +89,6 @@ def main():
         while not rospy.is_shutdown():
             t = rospy.Time.now()
             dt = (t - last_t).to_sec()
-
-            cur_m1 = m1
-            cur_m2 = m2
-
-            if cur_m1 < 0:
-                cur_m1 = 256 + cur_m1
-
-            if cur_m2 < 0:
-                cur_m2 = 256 + cur_m2
-
-            rospy.loginfo("Sending motor power request: {} / {} ({:x} / {:x})".format(
-                m1, m2, cur_m1, cur_m2
-            ))
-
-            ser.write([0xAA, 0x01, cur_m1, cur_m2])
-            ser.flush()
 
             ser.write([0xAA, 0x02])
             ser.flush()
