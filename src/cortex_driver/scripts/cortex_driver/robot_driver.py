@@ -55,7 +55,7 @@ def main():
     with serial.Serial('/dev/serial0', 9600, timeout=0.050) as ser:
         m1 = 0
         m2 = 0
-        
+
         def handle_motor_power_request(req):
             m1 = req.left_power
             m2 = req.right_power
@@ -67,13 +67,16 @@ def main():
             t = rospy.Time.now()
             dt = (t - last_t).to_sec()
 
-            if m1 < 0:
-                m1 = 256 + m1
+            cur_m1 = m1
+            cur_m2 = m2
 
-            if m2 < 0:
-                m2 = 256 + m2
+            if cur_m1 < 0:
+                cur_m1 = 256 + cur_m1
 
-            ser.write([0xAA, 0x01, m1, m2])
+            if cur_m2 < 0:
+                cur_m2 = 256 + cur_m2
+
+            ser.write([0xAA, 0x01, cur_m1, cur_m2])
 
             ser.write([0xAA, 0x02])
             ser.flush()
