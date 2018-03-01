@@ -108,9 +108,9 @@ def main():
                     v_fwd = (lv_left + lv_right) / 2
 
                     rot_matx = np.array([
-                        cos(cur_pose[2]), -sin(cur_pose[2]), 0
-                        sin(cur_pose[2]), cos(cur_pose[2]), 0
-                        0, 0, 0
+                        cos(cur_pose[2]), -sin(cur_pose[2]), 0,
+                        sin(cur_pose[2]), cos(cur_pose[2]), 0,
+                        0, 0, 0,
                     ])
 
                     new_pose = (rot_matx @ np.array([v_fwd, 0,0])) + cur_pose
