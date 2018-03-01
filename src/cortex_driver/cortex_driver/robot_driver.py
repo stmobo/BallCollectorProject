@@ -31,58 +31,58 @@ wheelbase = (21 * .5) * 0.0254  # meters
 wheel_circum = (4*pi) * 0.0254  # meters
 
 def wait_for_start_byte(ser):
-	start_t = rospy.Time.now()
-	while True:
-		start_byte = ser.read(1)
-		if start_byte == b'\x55':
-			return True
+    start_t = rospy.Time.now()
+    while True:
+        start_byte = ser.read(1)
+        if start_byte == b'\x55':
+            return True
 
-		if (rospy.Time.now() - start_t).to_sec() >= 0.050:
-			return False
+        if (rospy.Time.now() - start_t).to_sec() >= 0.050:
+            return False
 
 with serial.Serial('/dev/serial0', 9600, timeout=0.050) as ser:
-	m1 = 0
-	m2 = 0
+    m1 = 0
+    m2 = 0
 
-	def handle_motor_power_request(req):
-		m1 = req.left_power
-		m2 = req.right_power
-		return MotorPowerResponse()
+    def handle_motor_power_request(req):
+        m1 = req.left_power
+        m2 = req.right_power
+        return MotorPowerResponse()
 
-	mp_serv = rospy.Service('motor_power', MotorPower, handle_motor_power_request)
+    mp_serv = rospy.Service('motor_power', MotorPower, handle_motor_power_request)
 
     while not rospy.is_shutdown():
         t = rospy.Time.now()
         dt = (t - last_t).to_sec()
 
-		if m1 < 0:
-			m1 = 256 + m1
+        if m1 < 0:
+            m1 = 256 + m1
 
-		if m2 < 0:
-			m2 = 256 + m2
+        if m2 < 0:
+            m2 = 256 + m2
 
-		ser.write([0xAA, 0x01, m1, m2])
+        ser.write([0xAA, 0x01, m1, m2])
 
         ser.write([0xAA, 0x02])
-		ser.flush()
+        ser.flush()
 
         if wait_for_start_byte(ser):
             # Response starting...
             data = bytearray(ser.read(4))
 
-			if len(data) < 4:
-                # timed out waiting for response data
-                continue
+        if len(data) < 4:
+            # timed out waiting for response data
+            continue
 
             # reassemble encoder data
             enc_right = data[0] | (data[1] << 8)
-			enc_left = data[2] | (data[3] << 8)
+            enc_left = data[2] | (data[3] << 8)
 
-			if enc_right > 0x7FFF:
-				enc_right = -(0x10000 - enc_right)
+            if enc_right > 0x7FFF:
+                enc_right = -(0x10000 - enc_right)
 
-			if enc_left > 0x7FFF:
-				enc_left = -(0x10000 - enc_left)
+            if enc_left > 0x7FFF:
+                enc_left = -(0x10000 - enc_left)
 
             if (last_enc_left is None) or (last_enc_right is None):
                 last_enc_left = enc_left
