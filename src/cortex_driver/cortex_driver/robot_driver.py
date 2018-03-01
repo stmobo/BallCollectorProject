@@ -90,12 +90,12 @@ def main():
                     v_fwd = (lv_left + lv_right) / 2
 
                     rot_matx = np.array([
-                        cos(cur_pose[2]), -sin(cur_pose[2]), 0
-                        sin(cur_pose[2]), cos(cur_pose[2]), 0
-                        0, 0, 0
+                        cos(cur_pose[2]), -sin(cur_pose[2]), 0,
+                        sin(cur_pose[2]), cos(cur_pose[2]), 0,
+                        0, 0, 0,
                     ])
 
-                    new_pose = (rot_matx @ np.array([v_fwd, 0,0])) + cur_pose
+                    new_pose = np.matmul(rot_matx, np.array([v_fwd, 0,0])) + cur_pose
                 else:
                     # non-straight line motion
                     # see: https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf
@@ -115,7 +115,7 @@ def main():
                     ])
 
                     # update pose
-                    new_pose = (rot_matx @ np.array([
+                    new_pose = np.matmul(rot_matx, np.array([
                         cur_pose[0] - icc[0],
                         cur_pose[1] - icc[1],
                         cur_pose[2]
