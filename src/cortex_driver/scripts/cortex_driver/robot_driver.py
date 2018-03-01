@@ -9,7 +9,7 @@ import tf
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3
 from std_msgs.msg import Int16, Float64
-from .srv import *
+from cortex_driver.srv import *
 
 import serial
 

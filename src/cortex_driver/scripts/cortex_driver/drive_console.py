@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import rospy
 import re
-from .srv import *
+from cortex_driver.srv import *
 
 ptn = re.compile(r'\s*(\-?\d+)\s*[/|,]\s*(\-?\d+)')
 
