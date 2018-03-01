@@ -146,7 +146,7 @@ def main():
                 )
 
                 # publish odometry message
-                odom_msg = Odometry()
+                odom = Odometry()
                 odom.header.stamp = t
                 odom.header.frame_id = "odom"
                 odom.pose.pose = Pose(Point(cur_pose[0], cur_pose[1], 0), Quaternion(*odom_quat))
