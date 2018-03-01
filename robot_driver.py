@@ -28,6 +28,7 @@ r = rospy.Rate(10.0)
 
 wheelbase = (21 * .5) * 0.0254  # meters
 wheel_circum = (4*pi) * 0.0254  # meters
+encoder_conv_factor = 627.2  # ticks per revolution
 
 def wait_for_start_byte(ser):
 	start_t = rospy.Time.now()
@@ -70,16 +71,16 @@ with serial.Serial('/dev/serial0', 9600, timeout=0.050) as ser:
                 last_enc_right = enc_right
                 continue
 
-            # rotational velocity
+            # rotational velocity in ticks
             rv_left = (enc_left - last_enc_left) / dt
             rv_right = (enc_right - last_enc_right) / dt
 
             last_enc_left = enc_left
             last_enc_right = enc_right
 
-            # linear velocity
-            lv_left = rv_left * wheel_circum
-            lv_right = rv_right * wheel_circum
+            # linear velocity (m/sec)
+            lv_left = rv_left * (wheel_circum / encoder_conv_factor)
+            lv_right = rv_right * (wheel_circum / encoder_conv_factor)
 
             cur_vel = None
             new_pose = None
