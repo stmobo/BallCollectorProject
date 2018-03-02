@@ -65,8 +65,8 @@ def main():
 
             data.append(checksum)
 
-            rospy.loginfo_throttle(15, "Sending motor velocity request: {} / {}".format(
-                req.left_vel, req.right_vel
+            rospy.loginfo_throttle(15, "Sending motor velocity request: {} / {} \n {}".format(
+                req.left_vel, req.right_vel, data
             ))
 
             n = 0
