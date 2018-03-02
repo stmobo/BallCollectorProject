@@ -88,7 +88,7 @@ def main():
 
         def handle_cmd_vel(twist):
             rospy.loginfo("Got message over cmd_vel: ".format(str(twist)))
-            
+
             max_omega = ((2 * max_vel) / wheelbase) * (wheel_circum / encoder_conv_factor)
             max_vfwd = max_vel * (wheel_circum / encoder_conv_factor)
 
@@ -132,7 +132,7 @@ def main():
 
         mp_serv = rospy.Service('motor_power', MotorPower, handle_motor_power_request)
         mv_serv = rospy.Service('motor_vel', MotorVel, handle_motor_velocity_request)
-        rospy.Subscriber("/cmd_vel", Twist, handle_cmd_vel)
+        sub = rospy.Subscriber("/cmd_vel", Twist, handle_cmd_vel)
 
         while not rospy.is_shutdown():
             try:
