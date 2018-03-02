@@ -66,7 +66,7 @@ def main():
             if m2 < 0:
                 m2 = 256 + m2
 
-            checksum = 0xAA ^ 0x01 ^ (m1 & 0xFF) ^ (m2 & 0xFF)
+            checksum = 0xAA ^ 0x01 ^ m1 ^ m2
 
             rospy.loginfo_throttle(15, "Sending motor power request: {} / {} ({:x} / {:x})".format(
                 req.left_power, req.right_power, m1, m2
