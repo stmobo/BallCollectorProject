@@ -42,6 +42,7 @@ def main():
     wheelbase = (21 * .5) * 0.0254  # meters
     wheel_circum = (4*pi) * 0.0254  # meters
     encoder_conv_factor = 627.2  # ticks per revolution
+    max_vel = 850  # ticks/sec
 
     def wait_for_start_byte(ser):
         start_t = rospy.Time.now()
@@ -57,8 +58,8 @@ def main():
                 rospy.logwarn("Caught serial exception: {}".format(str(e)))
 
     with serial.Serial('/dev/serial0', 9600, timeout=0.050) as ser:
-        def handle_motor_velocity_request(req):
-            data = bytearray(struct.pack('<BBff', 0xAA, 0x03, req.left_vel, req.right_vel))
+        def set_motor_velocity(left_vel, right_vel):
+            data = bytearray(struct.pack('<BBff', 0xAA, 0x03, left_vel, right_vel))
             checksum = 0
             for b in data:
                 checksum ^= b
@@ -66,7 +67,7 @@ def main():
             data.append(checksum)
 
             rospy.loginfo_throttle(15, "Sending motor velocity request: {} / {}".format(
-                req.left_vel, req.right_vel
+                left_vel, right_vel
             ))
 
             n = 0
@@ -81,7 +82,21 @@ def main():
                 except serial.serialutil.SerialException as e:
                     rospy.logwarn("Caught serial exception: {}".format(str(e)))
 
+        def handle_motor_velocity_request(req):
+            set_motor_velocity(req.left_vel, req.right_vel)
             return MotorVelResponse()
+
+        def handle_cmd_vel(twist):
+            max_omega = ((2 * max_vel) / wheelbase) * (wheel_circum / encoder_conv_factor)
+            max_vfwd = max_vel * (wheel_circum / encoder_conv_factor)
+
+            omega = np.clip(twist.angular.z, -max_omega, max_omega)
+            v_fwd = np.clip(twist.linear.x, -max_vfwd, max_vfwd)
+
+            v_left = (v_fwd - omega * wheelbase / 2.0) * (encoder_conv_factor / wheel_circum)
+            v_right = (v_fwd + omega * wheelbase / 2.0) * (encoder_conv_factor / wheel_circum)
+
+            set_motor_velocity(v_left, v_right)
 
         def handle_motor_power_request(req):
             m1 = req.left_power
@@ -115,6 +130,7 @@ def main():
 
         mp_serv = rospy.Service('motor_power', MotorPower, handle_motor_power_request)
         mv_serv = rospy.Service('motor_vel', MotorVel, handle_motor_velocity_request)
+        rospy.Subscriber("cmd_vel", Twist, handle_cmd_vel)
 
         while not rospy.is_shutdown():
             try:
