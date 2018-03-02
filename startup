@@ -1,0 +1,2 @@
+#!/bin/bash
+git reset --hard HEAD && catkin_make install && source ./devel/setup.bash && roslaunch lidar-mapping.launch
