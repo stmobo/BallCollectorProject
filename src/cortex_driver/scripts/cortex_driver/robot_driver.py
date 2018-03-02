@@ -150,7 +150,7 @@ def main():
                             [0, 0, 0],
                         ])
 
-                        new_pose = np.matmul(rot_matx, np.array([v_fwd, 0,0])) + cur_pose
+                        new_pose = np.matmul(rot_matx, np.array([0, v_fwd,0])) + cur_pose
                     else:
                         # non-straight line motion
                         # see: https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf
