@@ -1,13 +1,13 @@
 <launch>
     <!--
         laser is:
-            (7.5 * .5") = 3.75" = 0.09525m in -X direction,
-            (10.5 * .5") = 5.25" = 0.13335m in -Y direction,
+            (10.5 * .5") = 5.25" = 0.13335m in -X direction,
+            (7.5 * .5") = 3.75" = 0.09525m in -Y direction,
             (19 * .5") = 9.5" = 0.2413m in +Z direction
-            and rotated -90 degrees (= -pi/2 radians = -1.571 radians)
+            and rotated 90 degrees (= pi/2 radians = 1.571 radians)
         ...roughly.
     -->
-    <node pkg="tf" type="static_transform_publisher" name="laser_pos" args="-0.09525 -0.13335 0.2413 -1.571 0 0 base_link laser 100" />
+    <node pkg="tf" type="static_transform_publisher" name="laser_pos" args="-0.13335 -0.09525 0.2413 1.571 0 0 base_link laser 100" />
 
     <node pkg="cortex_driver" type="robot_driver" name="robot_driver" output="screen" required="true"/>
 
