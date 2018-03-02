@@ -130,7 +130,7 @@ def main():
 
         mp_serv = rospy.Service('motor_power', MotorPower, handle_motor_power_request)
         mv_serv = rospy.Service('motor_vel', MotorVel, handle_motor_velocity_request)
-        rospy.Subscriber("cmd_vel", Twist, handle_cmd_vel)
+        rospy.Subscriber("/cmd_vel", Twist, handle_cmd_vel)
 
         while not rospy.is_shutdown():
             try:
