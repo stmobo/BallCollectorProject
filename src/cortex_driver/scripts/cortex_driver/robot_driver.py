@@ -87,6 +87,8 @@ def main():
             return MotorVelResponse()
 
         def handle_cmd_vel(twist):
+            rospy.loginfo("Got message over cmd_vel: ".format(str(twist)))
+            
             max_omega = ((2 * max_vel) / wheelbase) * (wheel_circum / encoder_conv_factor)
             max_vfwd = max_vel * (wheel_circum / encoder_conv_factor)
 
