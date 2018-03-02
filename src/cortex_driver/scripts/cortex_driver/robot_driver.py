@@ -105,7 +105,7 @@ def main():
                         rospy.logwarn("Timed out waiting for encoder repsonse data...")
                         continue
 
-                    checksum = 0
+                    checksum = 0x55
                     for b in data:
                         checksum ^= b
 
