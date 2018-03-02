@@ -3,6 +3,7 @@
 import math
 import numpy as np
 from numpy import sin, cos, pi
+import struct
 
 import rospy
 import tf
@@ -56,6 +57,32 @@ def main():
                 rospy.logwarn("Caught serial exception: {}".format(str(e)))
 
     with serial.Serial('/dev/serial0', 9600, timeout=0.050) as ser:
+        def handle_motor_velocity_request(req):
+            data = bytearray(struct.pack('<BBff', 0xAA, 0x03, req.left_vel, req.right_vel))
+            checksum = 0
+            for b in data:
+                checksum ^= b
+
+            data.append(checksum)
+
+            rospy.loginfo_throttle(15, "Sending motor velocity request: {} / {}".format(
+                req.left_vel, req.right_vel
+            ))
+
+            n = 0
+            while n < 5:
+                n += 1
+                try:
+                    ser.write(data)
+                    ser.flush()
+                    # wait for two start bytes as acknowledgement
+                    if wait_for_start_byte(ser) and wait_for_start_byte(ser):
+                        break
+                except serial.serialutil.SerialException as e:
+                    rospy.logwarn("Caught serial exception: {}".format(str(e)))
+
+            return MotorVelResponse()
+
         def handle_motor_power_request(req):
             m1 = req.left_power
             m2 = req.right_power
@@ -87,6 +114,7 @@ def main():
             return MotorPowerResponse()
 
         mp_serv = rospy.Service('motor_power', MotorPower, handle_motor_power_request)
+        mv_serv = rospy.Service('motor_vel', MotorVel, handle_motor_velocity_request)
 
         while not rospy.is_shutdown():
             try:
