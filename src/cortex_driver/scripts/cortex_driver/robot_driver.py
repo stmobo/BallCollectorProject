@@ -53,7 +53,7 @@ def main():
                 if (rospy.Time.now() - start_t).to_sec() >= 0.050:
                     return False
             except serial.serialutil.SerialException as e:
-                print("Caught serial exception: {}".format(str(e)))
+                rospy.logwarn("Caught serial exception: {}".format(str(e)))
 
     with serial.Serial('/dev/serial0', 9600, timeout=0.050) as ser:
         def handle_motor_power_request(req):
@@ -82,7 +82,7 @@ def main():
                     if wait_for_start_byte(ser) and wait_for_start_byte(ser):
                         break
                 except serial.serialutil.SerialException as e:
-                    print("Caught serial exception: {}".format(str(e)))
+                    rospy.logwarn("Caught serial exception: {}".format(str(e)))
 
             return MotorPowerResponse()
 
@@ -102,6 +102,7 @@ def main():
 
                     if len(data) < 5:
                         # timed out waiting for response data
+                        rospy.logwarn("Timed out while waiting for encoder frame payload")
                         continue
 
                     checksum = 0
@@ -110,6 +111,7 @@ def main():
 
                     if checksum != 0:
                         # got invalid checksum in response data
+                        rospy.logwarn("Got invalid checksum in encoder frame")
                         continue
 
                     # reassemble encoder data
@@ -216,7 +218,7 @@ def main():
                     last_t = t
                     r.sleep()
             except serial.serialutil.SerialException as e:
-                print("Caught serial exception: {}".format(str(e)))
+                rospy.logwarn("Caught serial exception: {}".format(str(e)))
 
 if __name__ == '__main__':
     main()
