@@ -42,51 +42,64 @@ task main()
 			sleep(5);
 		}
 
-		writeDebugStreamLine("Got command!");
-
 		unsigned char sub_cmd = waitForChar(UART1);
 		if(sub_cmd == 0x01) {
 			/* Set motors command */
 			short m1 = waitForChar(UART1);
 			short m2 = waitForChar(UART1);
+            char checksum = waitForChar(UART1);
+            char cmp = 0xAA ^ 0x01 ^ ((char)m1 & 0xFF) ^ ((char)m2 & 0xFF) ^ checksum;
 
-			writeDebugStreamLine("Got motor command: %x / %x", m1, m2);
+            if(cmp == 0) {
+                /* checksum okay, got a valid motor command */
+                writeDebugStreamLine("Got motor command: %x / %x", m1, m2);
 
-			if(m1 > 0x7F) {
-				m1 = (((~m1) + 1) & 0xFF);
-				m1 *= -1;
-			}
+    			if(m1 > 0x7F) {
+    				m1 = (((~m1) + 1) & 0xFF);
+    				m1 *= -1;
+    			}
 
-			if(m2 > 0x7F) {
-				m2 = ((~m2) + 1) & 0xFF;
-				m2 *= -1;
-			}
+    			if(m2 > 0x7F) {
+    				m2 = ((~m2) + 1) & 0xFF;
+    				m2 *= -1;
+    			}
 
-			motor[motor1] = m1;
-			motor[motor2] = m2;
+    			motor[motor1] = m1;
+    			motor[motor2] = m2;
 
-			sendChar(UART1, 0x55);
+    			sendChar(UART1, 0x55);
+    			sendChar(UART1, 0x55);
+            } else {
+                writeDebugStreamLine("Checksum failed for set motors command.");
+            }
 		} else if(sub_cmd == 0x02) {
-			/* Get encoder data */
-			writeDebugStreamLine("Got read encoder data command");
-			short e1 = -SensorValue[enc1];
-			short e2 = SensorValue[enc2];
+            char checksum = waitForChar(UART1);
+            if(0xAA ^ 0x02 ^ checksum == 0) {
+                /* Get encoder data */
+    			short e1 = -SensorValue[enc1];
+    			short e2 = SensorValue[enc2];
 
-			sendChar(UART1, 0x55);
+                char e1A = e1 & 0xFF;
+                char e1B = (e1 >> 8) & 0xFF;
 
-			sendChar(UART1, e1 & 0xFF);
-			sendChar(UART1, (e1 >> 8) & 0xFF);
+                char e2A = e2 & 0xFF;
+                char e2B = (e2 >> 8) & 0xFF;
 
-			sendChar(UART1, e2 & 0xFF);
-			sendChar(UART1, (e2 >> 8) & 0xFF);
+                char checksum = 0x55 ^ e1A ^ e1B ^ e2A ^ e2B;
 
-			n = 0;
-			while(!bXmitComplete(UART1)) {
-				if(n % 500 == 0) {
-					writeDebugStreamLine("Waiting for transmit to complete...");
-				}
-				n += 1;
-			}
+    			sendChar(UART1, 0x55);
+
+    			sendChar(UART1, e1A);
+    			sendChar(UART1, e1B);
+
+    			sendChar(UART1, e2A);
+    			sendChar(UART1, e2B);
+
+    			sendChar(UART1, checksum);
+    			while(!bXmitComplete(UART1)) {}
+            } else {
+                writeDebugStreamLine("Checksum failed for read encoder data command.");
+            }
 		} else {
 			writeDebugStreamLine("Got unknown command: 0x%x", sub_cmd);
 		}
