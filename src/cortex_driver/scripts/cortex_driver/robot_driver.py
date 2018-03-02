@@ -170,8 +170,8 @@ def main():
 
                     cur_vel = None
                     new_pose = None
-                    if abs(lv_left - lv_right) <= (0.0254 / 2):
-                        # wheels are within 0.5 in/sec of each other: assume straight-line motion
+                    if abs(lv_left - lv_right) <= (0.0254 * 4):
+                        # wheels are within 4 in/sec of each other: assume straight-line motion
                         v_fwd = (lv_left + lv_right) / 2
 
                         rot_matx = np.array([
