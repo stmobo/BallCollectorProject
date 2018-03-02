@@ -217,6 +217,8 @@ def main():
 
                     last_t = t
                     r.sleep()
+                else:
+                    rospy.logwarn("Timed out waiting for encoder frame response")
             except serial.serialutil.SerialException as e:
                 rospy.logwarn("Caught serial exception: {}".format(str(e)))
 
