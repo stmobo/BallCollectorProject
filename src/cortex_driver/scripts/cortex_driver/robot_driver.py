@@ -29,8 +29,8 @@ def main():
     vel_left_pub = rospy.Publisher("vel_left", Float64, queue_size=10)
     vel_right_pub = rospy.Publisher("vel_right", Float64, queue_size=10)
 
-    cur_pose = np.zeros(3)  # x, y, hdg
-    cur_vel = np.zeros(3)  # same order as above
+    cur_pose = np.zeros(3, dtype=np.float64)  # x, y, hdg
+    cur_vel = np.zeros(3, dtype=np.float64)  # same order as above
 
     last_enc_left = None
     last_enc_right = None
@@ -65,8 +65,8 @@ def main():
 
             data.append(checksum)
 
-            rospy.loginfo_throttle(15, "Sending motor velocity request: {} / {} \n {}".format(
-                req.left_vel, req.right_vel, ''.join('{:02x} '.format(x) for x in data)
+            rospy.loginfo_throttle(15, "Sending motor velocity request: {} / {}".format(
+                req.left_vel, req.right_vel
             ))
 
             n = 0
@@ -180,7 +180,7 @@ def main():
                             [0, 0, 0],
                         ])
 
-                        new_pose = np.matmul(rot_matx, np.array([v_fwd, 0,0])) + cur_pose
+                        new_pose = np.matmul(rot_matx, np.array([v_fwd, 0,0], dtype=np.float64)) + cur_pose
                     else:
                         # non-straight line motion
                         # see: https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf
@@ -191,20 +191,20 @@ def main():
                             -R * sin(cur_pose[2]),
                             R * cos(cur_pose[2]),
                             ang_vel * dt
-                        ])
+                        ], dtype=np.float64)
 
                         rot_matx = np.array([
                             [cos(ang_vel * dt), -sin(ang_vel * dt), 0],
                             [sin(ang_vel * dt), cos(ang_vel * dt), 0],
                             [0, 0, 1],
-                        ])
+                        ], dtype=np.float64)
 
                         # update pose
                         new_pose = np.matmul(rot_matx, np.array([
                             cur_pose[0] - icc[0],
                             cur_pose[1] - icc[1],
                             cur_pose[2]
-                        ])) + icc
+                        ], dtype=np.float64)) + icc
 
                     cur_vel = (new_pose - cur_pose) / dt
                     cur_pose = new_pose
