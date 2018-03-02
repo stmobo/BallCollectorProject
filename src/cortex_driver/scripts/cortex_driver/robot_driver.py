@@ -68,7 +68,7 @@ def main():
 
             checksum = 0xAA ^ 0x01 ^ (m1 & 0xFF) & (m2 & 0xFF)
 
-            rospy.loginfo("Sending motor power request: {} / {} ({:x} / {:x})".format(
+            rospy.loginfo_throttle(15, "Sending motor power request: {} / {} ({:x} / {:x})".format(
                 req.left_power, req.right_power, m1, m2
             ))
 
@@ -102,7 +102,7 @@ def main():
 
                     if len(data) < 5:
                         # timed out waiting for response data
-                        rospy.logwarn("Timed out waiting for encoder repsonse data...")
+                        rospy.logwarn_throttle(10, "Timed out waiting for encoder repsonse data...")
                         continue
 
                     checksum = 0x55
@@ -111,7 +111,7 @@ def main():
 
                     if checksum != 0:
                         # got invalid checksum in response data
-                        rospy.logwarn("Got invalid checksum in encoder repsonse data...")
+                        rospy.logwarn_throttle(10, "Got invalid checksum in encoder repsonse data...")
                         continue
 
                     # reassemble encoder data
@@ -218,7 +218,7 @@ def main():
                     last_t = t
                     r.sleep()
                 else:
-                    rospy.logwarn("Timed out waiting for encoder frame response")
+                    rospy.logwarn_throttle(10, "Timed out waiting for encoder frame response")
             except serial.serialutil.SerialException as e:
                 rospy.logwarn("Caught serial exception: {}".format(str(e)))
 
