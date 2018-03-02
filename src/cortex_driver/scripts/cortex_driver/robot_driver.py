@@ -13,11 +13,7 @@ from cortex_driver.srv import *
 
 import serial
 
-m1 = 0
-m2 = 0
-
 def main():
-    global m1, m2
     rospy.init_node('robot_driver')
 
     odom_pub = rospy.Publisher("odom", Odometry, queue_size=50)
@@ -61,8 +57,6 @@ def main():
 
     with serial.Serial('/dev/serial0', 9600, timeout=0.050) as ser:
         def handle_motor_power_request(req):
-            global m1, m2
-
             m1 = req.left_power
             m2 = req.right_power
 
@@ -72,19 +66,21 @@ def main():
             if m2 < 0:
                 m2 = 256 + m2
 
+            checksum = 0xAA ^ 0x01 ^ (m1 & 0xFF) & (m2 & 0xFF)
+
             rospy.loginfo("Sending motor power request: {} / {} ({:x} / {:x})".format(
                 req.left_power, req.right_power, m1, m2
             ))
 
             n = 0
             while n < 5:
+                n += 1
                 try:
-                    ser.write([0xAA, 0x01, m1, m2])
+                    ser.write([0xAA, 0x01, m1, m2, checksum])
                     ser.flush()
-                    if wait_for_start_byte(ser):
-                        # acknowledgement received
+                    # wait for two start bytes as acknowledgement
+                    if wait_for_start_byte(ser) and wait_for_start_byte(ser):
                         break
-                    n += 1
                 except serial.serialutil.SerialException as e:
                     print("Caught serial exception: {}".format(str(e)))
 
@@ -97,15 +93,23 @@ def main():
                 t = rospy.Time.now()
                 dt = (t - last_t).to_sec()
 
-                ser.write([0xAA, 0x02])
+                ser.write([0xAA, 0x02, (0xAA ^ 0x02)])
                 ser.flush()
 
                 if wait_for_start_byte(ser):
                     # Response starting...
-                    data = bytearray(ser.read(4))
+                    data = bytearray(ser.read(5))
 
-                    if len(data) < 4:
+                    if len(data) < 5:
                         # timed out waiting for response data
+                        continue
+
+                    checksum = 0
+                    for b in data:
+                        checksum ^= b
+
+                    if checksum != 0:
+                        # got invalid checksum in response data
                         continue
 
                     # reassemble encoder data
@@ -124,8 +128,8 @@ def main():
                         continue
 
                     # rotational velocity in ticks
-                    rv_left = -(enc_left - last_enc_left) / dt
-                    rv_right = -(enc_right - last_enc_right) / dt
+                    rv_left = (enc_left - last_enc_left) / dt
+                    rv_right = (enc_right - last_enc_right) / dt
 
                     last_enc_left = enc_left
                     last_enc_right = enc_right
