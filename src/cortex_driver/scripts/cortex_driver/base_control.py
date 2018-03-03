@@ -15,7 +15,7 @@ def send_motor_velocity(left_vel, right_vel):
         mp_prox = rospy.ServiceProxy('motor_vel', MotorVel)
         mp_prox(left_vel, right_vel)
     except rospy.ServiceException as e:
-        print("Service call failed: {}".format(str(e)))
+        rospy.logwarn("motor_vel service call failed: {}".format(str(e)))
 
 def handle_cmd_vel(twist):
     rospy.loginfo("Got message over cmd_vel: ".format(str(twist)))
