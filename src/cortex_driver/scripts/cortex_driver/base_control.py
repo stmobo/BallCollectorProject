@@ -3,6 +3,7 @@ import rospy
 import numpy as np
 from numpy import pi
 from geometry_msgs.msg import Twist
+import std_msgs.msg
 from cortex_driver.srv import *
 
 wheelbase = (21 * .5) * 0.0254  # meters
@@ -34,6 +35,9 @@ def handle_cmd_vel(data):
 
     #send_motor_velocity(v_left, v_right)
 
+def handle_test(data):
+    rospy.loginfo("handle_test called: " + data.data)
+
 def main():
     rospy.init_node('base_control')
 
@@ -42,6 +46,7 @@ def main():
 
     rospy.loginfo("Listening on cmd_vel...")
     rospy.Subscriber("cmd_vel",  Twist, callback=handle_cmd_vel)
+    rospy.Subscriber("test",  std_msgs.msg.String, callback=handle_test)
 
     rospy.spin()
 
