@@ -194,48 +194,16 @@ def main():
                     lv_left = rv_left * (wheel_circum / encoder_conv_factor)
                     lv_right = rv_right * (wheel_circum / encoder_conv_factor)
 
-                    cur_vel = None
-                    new_pose = None
-                    if abs(lv_left - lv_right) <= (0.0254 * 4):
-                        # wheels are within 6 in/sec of each other: assume straight-line motion
-                        rospy.loginfo_throttle(30, "Robot moving in straight-line motion")
-                        v_fwd = (lv_left + lv_right) / 2
+                    vel_rx = (lv_left + lv_right) / 2
+                    vel_r_rot = (lv_right - lv_left) / wheelbase
 
-                        rot_matx = np.array([
-                            [cos(cur_pose[2]), -sin(cur_pose[2]), 0,],
-                            [sin(cur_pose[2]), cos(cur_pose[2]), 0,],
-                            [0, 0, 0],
-                        ])
+                    cur_vel = np.array([
+                        vel_rx * cos(cur_pose[2]),
+                        vel_rx * sin(cur_pose[2]),
+                        vel_r_rot
+                    ])
 
-                        new_pose = np.matmul(rot_matx, np.array([v_fwd, 0,0], dtype=np.float64)) + cur_pose
-                    else:
-                        # non-straight line motion
-                        # see: https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf
-                        rospy.loginfo_throttle(30, "Robot moving in curved motion")
-                        R = ((lv_left + lv_right) / (lv_right - lv_left)) * (wheelbase / 2)
-                        ang_vel = (lv_right - lv_left) / wheelbase
-
-                        icc = cur_pose + np.array([
-                            -R * sin(cur_pose[2]),
-                            R * cos(cur_pose[2]),
-                            ang_vel * dt
-                        ], dtype=np.float64)
-
-                        rot_matx = np.array([
-                            [cos(ang_vel * dt), -sin(ang_vel * dt), 0],
-                            [sin(ang_vel * dt), cos(ang_vel * dt), 0],
-                            [0, 0, 1],
-                        ], dtype=np.float64)
-
-                        # update pose
-                        new_pose = np.matmul(rot_matx, np.array([
-                            cur_pose[0] - icc[0],
-                            cur_pose[1] - icc[1],
-                            cur_pose[2]
-                        ], dtype=np.float64)) + icc
-
-                    cur_vel = (new_pose - cur_pose) / dt
-                    cur_pose = new_pose
+                    cur_pose = cur_pose + (cur_vel * dt)
 
                     odom_quat = tf.transformations.quaternion_from_euler(0, 0, cur_pose[2])
 
