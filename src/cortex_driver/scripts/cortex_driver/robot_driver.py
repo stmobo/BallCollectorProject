@@ -59,7 +59,7 @@ def main():
 
     with serial.Serial('/dev/serial0', 9600, timeout=0.050) as ser:
         def set_motor_velocity(left_vel, right_vel):
-            data = bytearray(struct.pack('<BBff', 0xAA, 0x03, left_vel, right_vel))
+            data = bytearray(struct.pack('<BBff', 0xAA, 0x03, -left_vel, -right_vel))
             checksum = 0
             for b in data:
                 checksum ^= b
