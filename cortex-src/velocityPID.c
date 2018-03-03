@@ -89,3 +89,27 @@ task pidControl() {
         sleep(20);
     }
 }
+
+/*
+ * Use Velocity PID to move at a certain forward speed for a given time.
+ * Parameters:
+ * - speed: the speed to move at, in ticks/sec (positive = forward)
+ * - time: the time to move for, in seconds
+ */
+void pidTimedMovement(float speed, float t) {
+    startTask(pidControl);
+
+    short targetTime = (t * 1000); // time
+
+    leftPID.setpoint = speed;
+    rightPID.setpoint = speed;
+
+    while(time1[T3] < targetTime) {
+        sleep(5);
+    }
+
+    leftPID.setpoint = 0;
+    rightPID.setpoint = 0;
+
+    stopTask(pidControl);
+}
