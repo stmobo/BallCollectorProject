@@ -197,7 +197,8 @@ def main():
                     cur_vel = None
                     new_pose = None
                     if abs(lv_left - lv_right) <= (0.0254 * 4):
-                        # wheels are within 4 in/sec of each other: assume straight-line motion
+                        # wheels are within 6 in/sec of each other: assume straight-line motion
+                        rospy.loginfo_throttle(30, "Robot moving in straight-line motion")
                         v_fwd = (lv_left + lv_right) / 2
 
                         rot_matx = np.array([
@@ -210,6 +211,7 @@ def main():
                     else:
                         # non-straight line motion
                         # see: https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf
+                        rospy.loginfo_throttle(30, "Robot moving in curved motion")
                         R = ((lv_left + lv_right) / (lv_right - lv_left)) * (wheelbase / 2)
                         ang_vel = (lv_right - lv_left) / wheelbase
 
