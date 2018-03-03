@@ -17,14 +17,14 @@ def send_motor_velocity(left_vel, right_vel):
     except rospy.ServiceException as e:
         rospy.logwarn("motor_vel service call failed: {}".format(str(e)))
 
-def handle_cmd_vel(twist):
+def handle_cmd_vel(data):
     rospy.loginfo("Got message over cmd_vel: ".format(str(twist)))
 
     max_omega = ((2 * max_vel) / wheelbase) * (wheel_circum / encoder_conv_factor)
     max_vfwd = max_vel * (wheel_circum / encoder_conv_factor)
 
-    omega = np.clip(twist.angular.z, -max_omega, max_omega)
-    v_fwd = np.clip(twist.linear.x, -max_vfwd, max_vfwd)
+    omega = np.clip(data.angular.z, -max_omega, max_omega)
+    v_fwd = np.clip(data.linear.x, -max_vfwd, max_vfwd)
 
     v_left = (v_fwd - omega * wheelbase / 2.0) * (encoder_conv_factor / wheel_circum)
     v_right = (v_fwd + omega * wheelbase / 2.0) * (encoder_conv_factor / wheel_circum)
@@ -38,7 +38,7 @@ def main():
     rospy.wait_for_service('motor_vel')
 
     rospy.loginfo("Listening on cmd_vel...")
-    sub = rospy.Subscriber("cmd_vel",  Twist, handle_cmd_vel)
+    sub = rospy.Subscriber("cmd_vel",  Twist, callback=handle_cmd_vel)
 
     rospy.spin()
 
