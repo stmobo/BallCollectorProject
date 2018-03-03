@@ -1,0 +1,5 @@
+#!/usr/bin/env python
+import cortex_driver.base_control
+
+if __name__ == '__main__':
+    cortex_driver.base_control.main()

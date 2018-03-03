@@ -86,20 +86,6 @@ def main():
             set_motor_velocity(req.left_vel, req.right_vel)
             return MotorVelResponse()
 
-        def handle_cmd_vel(twist):
-            rospy.loginfo("Got message over cmd_vel: ".format(str(twist)))
-
-            max_omega = ((2 * max_vel) / wheelbase) * (wheel_circum / encoder_conv_factor)
-            max_vfwd = max_vel * (wheel_circum / encoder_conv_factor)
-
-            omega = np.clip(twist.angular.z, -max_omega, max_omega)
-            v_fwd = np.clip(twist.linear.x, -max_vfwd, max_vfwd)
-
-            v_left = (v_fwd - omega * wheelbase / 2.0) * (encoder_conv_factor / wheel_circum)
-            v_right = (v_fwd + omega * wheelbase / 2.0) * (encoder_conv_factor / wheel_circum)
-
-            set_motor_velocity(v_left, v_right)
-
         def handle_motor_power_request(req):
             m1 = req.left_power
             m2 = req.right_power
