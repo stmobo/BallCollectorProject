@@ -44,6 +44,9 @@ def main():
     encoder_conv_factor = 627.2  # ticks per revolution
     max_vel = 850  # ticks/sec
 
+    enc_wrap_low = 0.3 * (2**16) - (2**15)
+    enc_wrap_high = 0.7 * (2**16) - (2**15)
+
     def wait_for_start_byte(ser):
         start_t = rospy.Time.now()
         while True:
@@ -160,9 +163,29 @@ def main():
                         last_enc_right = enc_right
                         continue
 
+                    # handle wraparound:
+                    d_left = 0
+                    d_right = 0
+
+                    if last_enc_left > enc_wrap_high and enc_left < enc_wrap_low:
+                        # wrap around in positive direction
+                        d_left = (0x7FFF - last_enc_left) + (0x7FFF + enc_left)
+                    elif last_enc_left < enc_wrap_low and enc_left > enc_wrap_high:
+                        # wrap around in negative direction
+                        d_left = (0x7FFF + last_enc_left) + (0x7FFF - enc_left)
+                    else:
+                        d_left = enc_left - last_enc_left
+
+                    if last_enc_right > enc_wrap_high and enc_right < enc_wrap_low:
+                        d_right = (0x7FFF - last_enc_right) + (0x7FFF + enc_right)
+                    elif last_enc_right < enc_wrap_low and enc_right > enc_wrap_high:
+                        d_right = (0x7FFF + last_enc_right) + (0x7FFF - enc_right)
+                    else:
+                        d_right = enc_right - last_enc_right
+
                     # rotational velocity in ticks
-                    rv_left = (enc_left - last_enc_left) / dt
-                    rv_right = (enc_right - last_enc_right) / dt
+                    rv_left = d_left / dt
+                    rv_right = d_right / dt
 
                     last_enc_left = enc_left
                     last_enc_right = enc_right
