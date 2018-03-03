@@ -10,6 +10,7 @@
     <node pkg="tf" type="static_transform_publisher" name="laser_pos" args="-0.13335 -0.09525 0.2413 1.571 0 0 base_link laser 100" />
 
     <node pkg="cortex_driver" type="robot_driver" name="robot_driver" output="screen" required="true"/>
+    <node pkg="cortex_driver" type="base_control" name="base_control" output="screen" required="true"/>
 
     <node pkg="rplidar_ros" type="rplidarNode" name="lidar" respawn="true">
         <param name="serial_port"         type="string" value="/dev/ttyUSB0"/>
