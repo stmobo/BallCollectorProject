@@ -19,9 +19,7 @@ def send_motor_velocity(left_vel, right_vel):
         rospy.logwarn("motor_vel service call failed: {}".format(str(e)))
 
 def handle_cmd_vel(data):
-    rospy.loginfo("handle_cmd_vel called")
-
-    rospy.loginfo("Got message over cmd_vel: {}".format(str(twist)))
+    rospy.loginfo_throttle(10, "Got message over cmd_vel: {}".format(str(data)))
 
     #max_omega = ((2 * max_vel) / wheelbase) * (wheel_circum / encoder_conv_factor)
     #max_vfwd = max_vel * (wheel_circum / encoder_conv_factor)
