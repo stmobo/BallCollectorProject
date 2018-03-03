@@ -48,7 +48,7 @@ task main()
 			short m1 = waitForChar(UART1);
 			short m2 = waitForChar(UART1);
             char checksum = waitForChar(UART1);
-            char cmp = 0xAA ^ 0x01 ^ ((char)m1 & 0xFF) ^ ((char)m2 & 0xFF) ^ checksum;
+            short cmp = 0xAA ^ 0x01 ^ (m1 & 0xFF) ^ (m2 & 0xFF) ^ checksum;
 
             if(cmp == 0) {
                 /* checksum okay, got a valid motor command */
@@ -70,7 +70,8 @@ task main()
     			sendChar(UART1, 0x55);
     			sendChar(UART1, 0x55);
             } else {
-                writeDebugStreamLine("Checksum failed for set motors command.");
+            		short expected = 0xAA ^ 0x01 ^ (m1 & 0xFF) ^ (m2 & 0xFF);
+                writeDebugStreamLine("Checksum failed for set motors command, got %x but expected %x", checksum, expected);
             }
 		} else if(sub_cmd == 0x02) {
             char checksum = waitForChar(UART1);
