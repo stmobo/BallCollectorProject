@@ -9,10 +9,10 @@ typedef struct PIDData {
     short motorPort;
 } PIDData;
 
-float kP = 1;
+float kP = 0.35;
 float kI = 0;
 float kD = 0;
-float kF = 0;
+float kF = -0.001;
 float iZone = 2048;
 
 PIDData leftPID;
