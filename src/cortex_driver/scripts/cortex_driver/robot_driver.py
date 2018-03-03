@@ -148,11 +148,7 @@ def main():
 
                     if len(data) < 5:
                         # timed out waiting for response data
-<<<<<<< HEAD
-                        rospy.logwarn("Timed out while waiting for encoder frame payload")
-=======
                         rospy.logwarn_throttle(10, "Timed out waiting for encoder repsonse data...")
->>>>>>> 19ac48dcd68ab4e707031f432622e4fdf7035fcf
                         continue
 
                     checksum = 0x55
@@ -161,11 +157,7 @@ def main():
 
                     if checksum != 0:
                         # got invalid checksum in response data
-<<<<<<< HEAD
-                        rospy.logwarn("Got invalid checksum in encoder frame")
-=======
                         rospy.logwarn_throttle(10, "Got invalid checksum in encoder repsonse data...")
->>>>>>> 19ac48dcd68ab4e707031f432622e4fdf7035fcf
                         continue
 
                     # reassemble encoder data
