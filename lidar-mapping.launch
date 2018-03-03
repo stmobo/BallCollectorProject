@@ -30,4 +30,12 @@
         <param name="laser_max_dist" value="8.0" />
         <param name="map_update_distance_thresh" value="0.1" />
     </node>
+
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+        <rosparam file="costmap_common_params.yaml" command="load" ns="global_costmap" />
+        <rosparam file="costmap_common_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="local_costmap_params.yaml" command="load" />
+        <rosparam file="global_costmap_params.yaml" command="load" />
+        <rosparam file="base_local_planner_params.yaml" command="load" />
+    </node>
 </launch>
