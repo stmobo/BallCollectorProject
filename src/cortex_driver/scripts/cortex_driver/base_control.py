@@ -19,18 +19,20 @@ def send_motor_velocity(left_vel, right_vel):
         rospy.logwarn("motor_vel service call failed: {}".format(str(e)))
 
 def handle_cmd_vel(data):
-    rospy.loginfo("Got message over cmd_vel: ".format(str(twist)))
+    rospy.loginfo("handle_cmd_vel called")
 
-    max_omega = ((2 * max_vel) / wheelbase) * (wheel_circum / encoder_conv_factor)
-    max_vfwd = max_vel * (wheel_circum / encoder_conv_factor)
+    rospy.loginfo("Got message over cmd_vel: {}".format(str(twist)))
 
-    omega = np.clip(data.angular.z, -max_omega, max_omega)
-    v_fwd = np.clip(data.linear.x, -max_vfwd, max_vfwd)
+    #max_omega = ((2 * max_vel) / wheelbase) * (wheel_circum / encoder_conv_factor)
+    #max_vfwd = max_vel * (wheel_circum / encoder_conv_factor)
 
-    v_left = (v_fwd - omega * wheelbase / 2.0) * (encoder_conv_factor / wheel_circum)
-    v_right = (v_fwd + omega * wheelbase / 2.0) * (encoder_conv_factor / wheel_circum)
+    #omega = np.clip(data.angular.z, -max_omega, max_omega)
+    #v_fwd = np.clip(data.linear.x, -max_vfwd, max_vfwd)
 
-    send_motor_velocity(v_left, v_right)
+    #v_left = (v_fwd - omega * wheelbase / 2.0) * (encoder_conv_factor / wheel_circum)
+    #v_right = (v_fwd + omega * wheelbase / 2.0) * (encoder_conv_factor / wheel_circum)
+
+    #send_motor_velocity(v_left, v_right)
 
 def main():
     rospy.init_node('base_control')
