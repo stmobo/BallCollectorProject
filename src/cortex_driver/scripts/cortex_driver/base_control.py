@@ -33,8 +33,11 @@ def handle_cmd_vel(twist):
 
 def main():
     rospy.init_node('base_control')
+
+    rospy.loginfo("Waiting for motor_vel service...")
     rospy.wait_for_service('motor_vel')
 
+    rospy.loginfo("Listening on cmd_vel...")
     sub = rospy.Subscriber("cmd_vel",  Twist, handle_cmd_vel)
 
     rospy.spin()
