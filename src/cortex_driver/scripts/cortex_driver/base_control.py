@@ -24,7 +24,7 @@ def handle_cmd_vel(data):
     max_omega = ((2 * max_vel) / wheelbase) * (wheel_circum / encoder_conv_factor)
     max_vfwd = max_vel * (wheel_circum / encoder_conv_factor)
 
-    rospy.loginfo_throttle(60, "max omega: {:.3f}, max vfwd: {:.3f}", max_omega, max_vfwd)
+    rospy.loginfo_throttle(60, "max omega: {:.3f}, max vfwd: {:.3f}".format(max_omega, max_vfwd))
 
     omega = np.clip(data.angular.z, -max_omega, max_omega)
     v_fwd = np.clip(data.linear.x, -max_vfwd, max_vfwd)
