@@ -39,7 +39,7 @@ def main():
     rospy.wait_for_service('motor_vel')
 
     rospy.loginfo("Listening on cmd_vel...")
-    sub = rospy.Subscriber("cmd_vel",  Twist, callback=handle_cmd_vel)
+    rospy.Subscriber("cmd_vel",  Twist, callback=handle_cmd_vel)
 
     rospy.spin()
 
