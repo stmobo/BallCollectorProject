@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import rospy
 import numpy as np
+from numpy import pi
 from geometry_msgs.msg import Twist
 from cortex_driver.srv import *
 
