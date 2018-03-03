@@ -9,11 +9,105 @@
 
 char waitForChar(short port) {
 	while(true) {
-		char c = getChar(port);
-		if(c != -1) {
+		unsigned char c = getChar(port);
+		if(c != 0xFF) {
 			return c;
 		}
 	}
+}
+
+typedef struct PIDData {
+    float setpoint;
+    float i_acc;    // integral accumulator
+    float last_err; // last error value
+    short lastSensorValue;
+
+    bool invertSensor;
+    short sensorPort;
+    short motorPort;
+} PIDData;
+
+float kP = 0.25;
+float kI = 0;
+float kD = -0.001;
+float kF = 127.0 / 850.0;
+float iZone = 2048;
+
+PIDData leftPID;
+PIDData rightPID;
+
+void pidInit(PIDData *data) {
+    data->setpoint = 0;
+    data->i_acc = 0;
+    data->last_err = 0;
+    data->lastSensorValue = 0;
+}
+
+void pidUpdate(PIDData *data, float dt) {
+    float val = SensorValue[data->sensorPort];
+    if(data->invertSensor)
+        val *= -1;
+
+    float vel = (val - data->lastSensorValue) / dt;
+    data->lastSensorValue = val;
+
+    float err = data->setpoint - vel;
+    //writeDebugStreamLine("Err: %f", err);
+
+    data->i_acc += err * dt;
+    if(data->i_acc > iZone || data->i_acc < -iZone) {
+        data->i_acc = 0;
+    }
+
+    float d_err = (err - data->last_err) / dt;
+    data->last_err = err;
+
+    float lp = err * kP;
+    float li = data->i_acc * kI;
+    float ld = d_err * kD;
+    float lf = data->setpoint * kF;
+
+    float out_f = lp+li+ld+lf;
+    short out_i = (short)out_f;
+
+    if(out_i < -127)
+        out_i = -127;
+
+    if(out_i > 127)
+        out_i = 127;
+
+    motor[data->motorPort] = out_i;
+}
+
+task pidControl() {
+    pidInit(&leftPID);
+    pidInit(&rightPID);
+
+		rightPID.motorPort = motor1;
+		rightPID.sensorPort = enc2;
+		rightPID.invertSensor = false;
+
+		leftPID.motorPort = motor2;
+		leftPID.sensorPort = enc1;
+		leftPID.invertSensor = true;
+
+		SensorValue[enc1] = 0;
+		SensorValue[enc2] = 0;
+		
+    time1[T2] = 0;
+
+    sleep(20);
+
+    while(true) {
+        float dt = time1[T2];
+        dt /= 1000;
+
+        pidUpdate(&leftPID, dt);
+        pidUpdate(&rightPID, dt);
+
+        time1[T2] = 0;
+        sleep(20);
+    }
 }
 
 task main()
@@ -35,9 +129,11 @@ task main()
 
 		n += 1;
 	}
+	
+	startTask(pidControl);
 
 	while(true) {
-		writeDebugStreamLine("Waiting for command...");
+		//writeDebugStreamLine("Waiting for command...");
 		while(waitForChar(UART1) != 0xAA) {
 			sleep(5);
 		}
@@ -73,6 +169,28 @@ task main()
             		short expected = 0xAA ^ 0x01 ^ (m1 & 0xFF) ^ (m2 & 0xFF);
                 writeDebugStreamLine("Checksum failed for set motors command, got %x but expected %x", checksum, expected);
             }
+    } else if(sub_cmd == 0x03) {
+    	unsigned char payload[8];
+    	unsigned char cmp = 0xAA ^ 0x03;
+    	for(int i=0;i<8;i++) {
+    		payload[i] = waitForChar(UART1);
+    		cmp ^= payload[i];
+    	}
+    	
+    	unsigned char checksum = waitForChar(UART1);
+    	
+    	if(cmp ^ checksum == 0) {
+    		float *values = (float*)(&payload);
+    		leftPID.setpoint = values[0];
+    		rightPID.setpoint = values[1];
+ 
+    		writeDebugStreamLine("Got PID motor control command: %f / %f", values[0], values[1]);
+    		
+    			sendChar(UART1, 0x55);
+    			sendChar(UART1, 0x55);
+    	} else {
+    		writeDebugStreamLine("Got invalid checksum for PID motor data.");
+    	}
 		} else if(sub_cmd == 0x02) {
             char checksum = waitForChar(UART1);
             if(0xAA ^ 0x02 ^ checksum == 0) {

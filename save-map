@@ -1,0 +1,4 @@
+#!/bin/bash
+export ROS_MASTER_URI=http://ubiquityrobot.local:11311
+echo Connecting to $ROS_MASTER_URI
+rosrun map_server map_saver
