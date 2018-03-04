@@ -33,6 +33,9 @@ float kD = -0.001;
 float kF = 127.0 / 850.0;
 float iZone = 2048;
 
+float wrap_low = 0.3 * 65536 - 32768;
+float wrap_high = 0.7 * 65536 - 32768;
+
 PIDData leftPID;
 PIDData rightPID;
 
@@ -48,7 +51,18 @@ void pidUpdate(PIDData *data, float dt) {
     if(data->invertSensor)
         val *= -1;
 
-    float vel = (val - data->lastSensorValue) / dt;
+    float diff = 0;
+    if(data->lastSensorValue > wrap_high && val < wrap_low) {
+        // sensor value wrapped around past the upper limit
+        diff = (32768 - data->lastSensorValue) + (32768 + val);
+    } else if(data->lastSensorValue < wrap_low && val > wrap_high) {
+        // sensor value wrapped around past the lower limit
+         diff = (32768 + data->lastSensorValue) + (32768 - val);
+    } else {
+        diff = val - data->lastSensorValue;
+    }
+
+    float vel = diff / dt;
     data->lastSensorValue = val;
 
     float err = data->setpoint - vel;
@@ -93,7 +107,7 @@ task pidControl() {
 
 		SensorValue[enc1] = 0;
 		SensorValue[enc2] = 0;
-		
+
     time1[T2] = 0;
 
     sleep(20);
@@ -129,7 +143,7 @@ task main()
 
 		n += 1;
 	}
-	
+
 	startTask(pidControl);
 
 	while(true) {
@@ -176,16 +190,16 @@ task main()
     		payload[i] = waitForChar(UART1);
     		cmp ^= payload[i];
     	}
-    	
+
     	unsigned char checksum = waitForChar(UART1);
-    	
+
     	if(cmp ^ checksum == 0) {
     		float *values = (float*)(&payload);
     		leftPID.setpoint = values[0];
     		rightPID.setpoint = values[1];
- 
+
     		writeDebugStreamLine("Got PID motor control command: %f / %f", values[0], values[1]);
-    		
+
     			sendChar(UART1, 0x55);
     			sendChar(UART1, 0x55);
     	} else {
