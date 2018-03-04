@@ -39,8 +39,8 @@ def main():
     last_t = rospy.Time.now()
     r = rospy.Rate(10.0)
 
-    wheelbase = (21 * .5) * 0.0254  # meters
-    wheel_circum = (4*pi) * 0.0254  # meters
+    wheelbase = 0.28  # meters
+    wheel_circum = 2 * pi * .051 # meters
     encoder_conv_factor = 627.2  # ticks per revolution
     max_vel = 850  # ticks/sec
 
