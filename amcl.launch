@@ -1,7 +1,7 @@
 <launch>
     <include file="common.launch" />
 
-    <node pkg="map_server" type="map_server" args="map.yaml" />
+    <node pkg="map_server" type="map_server" args="map.yaml" name="map_server" />
 
     <node pkg="amcl" type="amcl" name="amcl" output="screen">
         <!-- Publish scans from best pose at a max of 10 Hz -->
