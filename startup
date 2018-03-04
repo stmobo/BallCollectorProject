@@ -1,2 +1,0 @@
-#!/bin/bash
-git reset --hard HEAD && catkin_make install && source ./install/setup.bash && roslaunch hector.launch
