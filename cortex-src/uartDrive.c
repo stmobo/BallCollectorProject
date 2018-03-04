@@ -98,16 +98,16 @@ task pidControl() {
     pidInit(&leftPID);
     pidInit(&rightPID);
 
-		rightPID.motorPort = motor1;
-		rightPID.sensorPort = enc2;
-		rightPID.invertSensor = false;
+	rightPID.motorPort = motor1;
+	rightPID.sensorPort = enc2;
+	rightPID.invertSensor = false;
 
-		leftPID.motorPort = motor2;
-		leftPID.sensorPort = enc1;
-		leftPID.invertSensor = true;
+	leftPID.motorPort = motor2;
+	leftPID.sensorPort = enc1;
+	leftPID.invertSensor = true;
 
-		SensorValue[enc1] = 0;
-		SensorValue[enc2] = 0;
+	SensorValue[enc1] = 0;
+	SensorValue[enc2] = 0;
 
     time1[T2] = 0;
 
@@ -148,16 +148,16 @@ task main()
 	startTask(pidControl);
 
 	while(true) {
-		//writeDebugStreamLine("Waiting for command...");
-		while(waitForChar(UART1) != 0xAA) {
-			sleep(5);
-		}
+        //writeDebugStreamLine("Waiting for command...");
+        while(waitForChar(UART1) != 0xAA) {
+        	sleep(5);
+        }
 
-		unsigned char sub_cmd = waitForChar(UART1);
-		if(sub_cmd == 0x01) {
-			/* Set motors command */
-			short m1 = waitForChar(UART1);
-			short m2 = waitForChar(UART1);
+        unsigned char sub_cmd = waitForChar(UART1);
+        if(sub_cmd == 0x01) {
+            /* Set motors command */
+            short m1 = waitForChar(UART1);
+            short m2 = waitForChar(UART1);
             char checksum = waitForChar(UART1);
             short cmp = 0xAA ^ 0x01 ^ (m1 & 0xFF) ^ (m2 & 0xFF) ^ checksum;
 
@@ -165,48 +165,48 @@ task main()
                 /* checksum okay, got a valid motor command */
                 writeDebugStreamLine("Got motor command: %x / %x", m1, m2);
 
-    			if(m1 > 0x7F) {
-    				m1 = (((~m1) + 1) & 0xFF);
-    				m1 *= -1;
-    			}
+            	if(m1 > 0x7F) {
+            		m1 = (((~m1) + 1) & 0xFF);
+            		m1 *= -1;
+            	}
 
-    			if(m2 > 0x7F) {
-    				m2 = ((~m2) + 1) & 0xFF;
-    				m2 *= -1;
-    			}
+            	if(m2 > 0x7F) {
+            		m2 = ((~m2) + 1) & 0xFF;
+            		m2 *= -1;
+            	}
 
-    			motor[motor1] = m1;
-    			motor[motor2] = m2;
+            	motor[motor1] = m1;
+            	motor[motor2] = m2;
 
-    			sendChar(UART1, 0x55);
-    			sendChar(UART1, 0x55);
+            	sendChar(UART1, 0x55);
+            	sendChar(UART1, 0x55);
             } else {
             		short expected = 0xAA ^ 0x01 ^ (m1 & 0xFF) ^ (m2 & 0xFF);
                 writeDebugStreamLine("Checksum failed for set motors command, got %x but expected %x", checksum, expected);
             }
-    } else if(sub_cmd == 0x03) {
-    	unsigned char payload[8];
-    	unsigned char cmp = 0xAA ^ 0x03;
-    	for(int i=0;i<8;i++) {
-    		payload[i] = waitForChar(UART1);
-    		cmp ^= payload[i];
-    	}
+        } else if(sub_cmd == 0x03) {
+            unsigned char payload[8];
+            unsigned char cmp = 0xAA ^ 0x03;
+            for(int i=0;i<8;i++) {
+            	payload[i] = waitForChar(UART1);
+            	cmp ^= payload[i];
+            }
 
-    	unsigned char checksum = waitForChar(UART1);
+            unsigned char checksum = waitForChar(UART1);
 
-    	if(cmp ^ checksum == 0) {
-    		float *values = (float*)(&payload);
-    		leftPID.setpoint = values[0];
-    		rightPID.setpoint = values[1];
+            if(cmp ^ checksum == 0) {
+            	float *values = (float*)(&payload);
+            	leftPID.setpoint = values[0];
+            	rightPID.setpoint = values[1];
 
-    		writeDebugStreamLine("Got PID motor control command: %f / %f", values[0], values[1]);
+            	writeDebugStreamLine("Got PID motor control command: %f / %f", values[0], values[1]);
 
-    			sendChar(UART1, 0x55);
-    			sendChar(UART1, 0x55);
-    	} else {
-    		writeDebugStreamLine("Got invalid checksum for PID motor data.");
-    	}
-		} else if(sub_cmd == 0x02) {
+            	sendChar(UART1, 0x55);
+            	sendChar(UART1, 0x55);
+            } else {
+            	writeDebugStreamLine("Got invalid checksum for PID motor data.");
+            }
+	   } else if(sub_cmd == 0x02) {
             char checksum = waitForChar(UART1);
             if(0xAA ^ 0x02 ^ checksum == 0) {
                 /* Get encoder data */
