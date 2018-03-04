@@ -1,2 +1,2 @@
 #!/bin/bash
-git reset --hard HEAD && catkin_make install && source ./install/setup.bash && roslaunch launch/amcl.launch
+git reset --hard HEAD && catkin_make install && source ./install/setup.bash && roslaunch launch/common.launch launch/amcl.launch
