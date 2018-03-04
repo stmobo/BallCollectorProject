@@ -6,8 +6,8 @@ raytrace_range: 8.0
 # 14.5" / 2 = 7.25" = 0.18415m, 11" / 2 = 5.5" = 0.1397m
 footprint: [[0.1397, 0.18415], [0.1397, -0.18415], [-0.1397, -0.18415], [-0.1397, 0.18415]]
 
-# stay about 12" away from obstacles (= 0.3048m)
-inflation_radius: 0.3048
+# stay about 8" away from obstacles (= 0.3048m)
+inflation_radius: 0.2032
 
 observation_sources: laser_scan_sensor
 
