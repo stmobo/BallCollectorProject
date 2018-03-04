@@ -27,9 +27,9 @@ typedef struct PIDData {
     short motorPort;
 } PIDData;
 
-float kP = 0.25;
+float kP = 0.275;
 float kI = 0;
-float kD = -0.001;
+float kD = -0.002;
 float kF = 127.0 / 850.0;
 float iZone = 2048;
 
@@ -47,7 +47,7 @@ void pidInit(PIDData *data) {
 }
 
 void pidUpdate(PIDData *data, float dt) {
-    float val = SensorValue[data->sensorPort];
+    short val = SensorValue[data->sensorPort];
     if(data->invertSensor)
         val *= -1;
 
@@ -63,6 +63,7 @@ void pidUpdate(PIDData *data, float dt) {
     }
 
     float vel = diff / dt;
+
     data->lastSensorValue = val;
 
     float err = data->setpoint - vel;
