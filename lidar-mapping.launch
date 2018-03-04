@@ -26,7 +26,7 @@
         <param name="base_frame" value="base_link" />
         <param name="odom_frame" value="odom" />
 
-        <param name="laser_min_dist" value="0.05" />
+        <param name="laser_min_dist" value="0.2" />
         <param name="laser_max_dist" value="8.0" />
         <param name="map_update_distance_thresh" value="0.1" />
     </node>
