@@ -1,13 +1,13 @@
 obstacle_range: 7.5
 raytrace_range: 8.0
 
-# robot is roughly 12.5" (y-axis) by 9" (x-axis)
-# We add an extra two inches to those to be safe
-# 14.5" / 2 = 7.25" = 0.18415m, 11" / 2 = 5.5" = 0.1397m
-footprint: [[0.1397, 0.18415], [0.1397, -0.18415], [-0.1397, -0.18415], [-0.1397, 0.18415]]
+# robot is roughly 12.75" (y-axis) by 17.25" (x-axis)
+# +X bound: 12" = 0.3048m
+# -X bound: = -5.5" = -0.1397m
+footprint: [[0.3048, 0.18415], [0.3048, -0.18415], [-0.1397, -0.18415], [-0.1397, 0.18415]]
 
-# stay about 8" away from obstacles (= 0.3048m)
-inflation_radius: 0.2032
+# stay about 4" away from obstacles (= 0.1016m)
+inflation_radius: 0.1016
 
 observation_sources: laser_scan_sensor
 
