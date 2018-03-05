@@ -19,3 +19,5 @@ DWAPlannerROS:
     #holonomic_robot: false
     min_vel_y: 0.0
     max_vel_y: 0.0
+
+    controller_frequency: 5.0
