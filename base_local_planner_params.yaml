@@ -13,7 +13,7 @@ DWAPlannerROS:
     min_rot_vel: 0.4
 
     acc_lim_th: 3.2
-    acc_lim_x: 1.25
+    acc_lim_x: 0.2
     acc_lim_y: 0
 
     holonomic_robot: false
