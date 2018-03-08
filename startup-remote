@@ -1,0 +1,9 @@
+#!/bin/bash
+git push robot master
+catkin_make install
+source devel/setup.bash
+ssh ubuntu@ubiquityrobot.local "cd /home/ubuntu/BallCollectorProject && ./startup-core"
+roslaunch launch/hector.launch &
+./launch-rviz &
+rosrun rqt_console rqt_console &
+./launch-drive-console &
