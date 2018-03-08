@@ -4,6 +4,6 @@ catkin_make install
 source devel/setup.bash
 ssh ubuntu@ubiquityrobot.local "cd /home/ubuntu/BallCollectorProject && ./startup-core" &
 roslaunch launch/hector.launch &
-./launch-rviz &
+rosrun rviz rviz &
 rosrun rqt_console rqt_console &
-./launch-drive-console &
+rosrun cortex_driver drive_console &

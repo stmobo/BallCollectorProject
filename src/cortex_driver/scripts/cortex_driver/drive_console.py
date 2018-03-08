@@ -37,9 +37,9 @@ def main():
             elif i[0] == 'b' or i[0] == 's':
                 make_motor_call(-300*mult, -300*mult)
             elif i[0] == 'l' or i[0] == 'a':
-                make_motor_call(300*mult, -300*mult)
-            elif i[0] == 'r' or i[0] == 'd':
                 make_motor_call(-300*mult, 300*mult)
+            elif i[0] == 'r' or i[0] == 'd':
+                make_motor_call(300*mult, -300*mult)
         else:
             m = ptn.match(i)
 
